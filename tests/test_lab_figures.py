@@ -225,6 +225,32 @@ class FigureTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.upload(raw=b'%PDF-1.7\n' + b'0' * (F.MAX_PDF_BYTES + 1))
 
+    def test_images_inside_text_fields_belong_to_the_new_experiment(self):
+        up = F.upload(self.desk, {'experiment_id': '', 'inline': True, 'field': 'model', 'day': DAY,
+                                  'filename': 'arch.png', 'data': base64.b64encode(PNG).decode()})
+        self.assertTrue(up['url'].startswith('/api/experiments/figure?id=' + up['figure_id']))
+        self.assertEqual(E.read(self.desk, DAY)['loose_figures'], [], 'unsaved inline images are not listed as loose')
+        text = '编码器结构如下：\n![整体结构，左边是编码器](figure:%s)\n右边接 LLM。' % up['figure_id']
+        out = E.save(self.desk, {'action': 'save', 'day': DAY, 'experiment': {'title': '新实验', 'model': text}})
+        exp = next(e for e in out['experiments'] if e['id'] == out['saved_id'])
+        self.assertEqual(exp['model'], text, 'text and image marker are stored together')
+        fig = exp['figures'][0]
+        self.assertEqual((fig['inline'], fig['field'], fig['caption']), (True, 'model', '整体结构，左边是编码器'))
+        # removing the marker later keeps the image as a normal attachment
+        E.save(self.desk, {'action': 'save', 'id': exp['id'], 'revision': exp['revision'], 'day': DAY,
+                           'experiment': {'title': '新实验', 'model': '只剩文字'}})
+        exp = next(e for e in E.read(self.desk, DAY)['experiments'] if e['id'] == out['saved_id'])
+        self.assertFalse(exp['figures'][0]['inline'])
+
+    def test_inline_rules(self):
+        with self.assertRaises(ValueError):
+            F.upload(self.desk, {'experiment_id': self.exp, 'inline': True, 'field': 'title', 'data': base64.b64encode(PNG).decode()})
+        with self.assertRaises(ValueError):
+            F.upload(self.desk, {'experiment_id': self.exp, 'inline': True, 'field': 'results', 'data': base64.b64encode(b'%PDF-1.4 x').decode()})
+        self.use_vision()
+        F.upload(self.desk, {'experiment_id': self.exp, 'inline': True, 'field': 'results', 'mode': 'table', 'data': base64.b64encode(PNG).decode()})
+        self.assertEqual(self.calls, [], 'inline images are kept as images, no model call')
+
     def test_image_file_rejects_path_tricks(self):
         self.assertEqual(F.image_file(self.desk, '../../settings'), (None, None))
 

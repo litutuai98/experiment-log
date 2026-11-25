@@ -16,6 +16,8 @@ import uuid
 from . import backend
 
 KINDS = ('image', 'table', 'file')
+INLINE_FIELDS = ('data', 'model', 'results', 'conclusion', 'paths', 'notes')
+TOKEN = re.compile(r'!\[([^\]\n]{0,300})\]\(figure:([0-9a-f]{32})\)')
 MAX_BYTES = 10 * 1024 * 1024
 MAX_PDF_BYTES = 15 * 1024 * 1024   # 请求体上限 25 MB，base64 后约 20 MB
 MAX_COLUMNS = 30
@@ -59,6 +61,12 @@ def init(desk):
           analysis TEXT NOT NULL DEFAULT '', created TEXT NOT NULL, updated TEXT NOT NULL,
           revision INTEGER NOT NULL DEFAULT 1)''')
         c.execute('CREATE INDEX IF NOT EXISTS lab_figures_experiment ON lab_figures(experiment_id)')
+        existing = {r[1] for r in c.execute('PRAGMA table_info(lab_figures)')}
+        # inline=1：嵌在某个文字框里的图，field 记录是哪个字段；只在正文里显示，不进附件区。
+        if 'inline' not in existing:
+            c.execute('ALTER TABLE lab_figures ADD COLUMN inline INTEGER NOT NULL DEFAULT 0')
+        if 'field' not in existing:
+            c.execute("ALTER TABLE lab_figures ADD COLUMN field TEXT NOT NULL DEFAULT ''")
 
 
 def folder(desk):
@@ -106,6 +114,7 @@ def public(row):
     item['table'] = json.loads(item.pop('table_json') or 'null')
     item['analysis'] = json.loads(item['analysis'] or 'null')
     item['url'] = '/api/experiments/figure?id=' + item['id'] + '&v=' + item['sha256'][:12]
+    item['inline'] = bool(item.get('inline'))
     item.pop('file', None)
     return item
 
@@ -115,6 +124,8 @@ def for_read(desk):
         rows = [public(r) for r in c.execute('SELECT * FROM lab_figures ORDER BY created,id')]
     grouped = {}
     for row in rows:
+        if row['inline'] and not row['experiment_id']:
+            continue   # 新建实验时插进文字框、还没保存的图
         grouped.setdefault(row['experiment_id'], []).append(row)
     return grouped
 
@@ -226,7 +237,11 @@ def experiment_title(c, experiment_id):
 
 
 def upload(desk, data):
-    mode = data.get('mode', 'auto')
+    inline = bool(data.get('inline'))
+    field = str(data.get('field') or '')
+    if inline and field not in INLINE_FIELDS:
+        raise ValueError('这个字段不能插图片')
+    mode = 'image' if inline else data.get('mode', 'auto')
     if mode not in ('auto', 'image', 'table'):
         raise ValueError('保存方式无效')
     day = backend.day_value(data.get('day'))
@@ -248,6 +263,8 @@ def upload(desk, data):
         raise ValueError('图片超过 10 MB，请压缩或截取需要的部分后再上传')
     if not mime:
         raise ValueError('只支持图片（PNG、JPEG、GIF、WebP）和 PDF')
+    if inline and mime == 'application/pdf':
+        raise ValueError('文字里只能插图片；PDF 请放到“图片与附件”里')
     with desk.conn() as c:
         context = experiment_title(c, experiment_id)
         if variant_id and (not experiment_id or not c.execute('SELECT 1 FROM lab_variants WHERE id=? AND experiment_id=?', (variant_id, experiment_id)).fetchone()):
@@ -266,14 +283,16 @@ def upload(desk, data):
     kind = 'file' if mime == 'application/pdf' else parsed['kind'] if parsed else 'image'
     with desk.conn() as c:
         c.execute('''INSERT INTO lab_figures(id,experiment_id,variant_id,day,kind,title,caption,file,mime,sha256,size,
-                     table_json,analysis,created,updated) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+                     table_json,analysis,created,updated,inline,field) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
                   (figure_id, experiment_id, variant_id, day, kind,
                    (parsed or {}).get('title') or title, (parsed or {}).get('caption', ''), name, mime, digest, len(raw),
                    json.dumps(parsed['table'], ensure_ascii=False) if parsed and parsed['table'] else '',
-                   json.dumps(parsed['analysis'], ensure_ascii=False) if parsed else '', backend.stamp(), backend.stamp()))
+                   json.dumps(parsed['analysis'], ensure_ascii=False) if parsed else '', backend.stamp(), backend.stamp(),
+                   int(inline), field))
         if experiment_id:
             c.execute('UPDATE lab_experiments SET updated=?,revision=revision+1 WHERE id=?', (backend.stamp(), experiment_id))
-    return {'figure_id': figure_id, 'kind': kind, 'notice': failure or notice}
+    return {'figure_id': figure_id, 'kind': kind, 'notice': failure or notice,
+            'url': '/api/experiments/figure?id=' + figure_id + '&v=' + digest[:12]}
 
 
 def move(desk, data):
@@ -413,3 +432,18 @@ def save_vision(desk, data):
         values['clear_vision_api_key'] = True
     desk.save_settings(values)
     return vision_status(desk)
+
+
+def sync_inline(c, experiment_id, values):
+    """保存实验时调用：文字里引用的图归到这个实验并同步说明；不再引用的内嵌图转成普通附件，不丢。"""
+    referenced = {}
+    for field in INLINE_FIELDS:
+        for desc, figure_id in TOKEN.findall(values.get(field) or ''):
+            referenced.setdefault(figure_id, (field, desc.strip()))
+    for figure_id, (field, desc) in referenced.items():
+        c.execute("""UPDATE lab_figures SET experiment_id=?,inline=1,field=?,caption=?,updated=?
+                     WHERE id=? AND (experiment_id='' OR experiment_id=?)""",
+                  (experiment_id, field, clean_text(desc, 1000), backend.stamp(), figure_id, experiment_id))
+    for row in c.execute('SELECT id FROM lab_figures WHERE experiment_id=? AND inline=1', (experiment_id,)).fetchall():
+        if row['id'] not in referenced:
+            c.execute('UPDATE lab_figures SET inline=0,updated=? WHERE id=?', (backend.stamp(), row['id']))

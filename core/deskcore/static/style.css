@@ -1437,3 +1437,9 @@ dialog[open]::backdrop{animation:overlayIn .18s ease-out}
 .shortcut-table td{padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:top}
 .shortcut-table tr:last-child td{border-bottom:0}
 .shortcut-table kbd{font-family:var(--mono);font-size:12px;background:var(--chip);border:1px solid var(--line-2);border-radius:5px;padding:1px 7px;white-space:nowrap}
+
+/* Notes share the agenda but never participate in deadline counts. */
+.todo-pane-tabs{display:flex;gap:24px;border-bottom:1px solid var(--line-2);margin-bottom:24px}
+.todo-pane-tabs button{padding:10px 2px;background:none;color:var(--muted);border:0;border-bottom:2px solid transparent;border-radius:0;font-weight:600;font-size:15px}
+.todo-pane-tabs button[aria-pressed="true"]{color:var(--ink);border-bottom-color:var(--ink)}
+.todo-page.show-notes>.todo-hero,.todo-page.show-notes>#todo-reminder-slot,.todo-page.show-notes>.todo-layout,.todo-page.show-notes>.todo-hint{display:none}

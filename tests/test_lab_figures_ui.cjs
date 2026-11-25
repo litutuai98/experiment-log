@@ -22,7 +22,7 @@ function sandbox({vision=true}={}){
   localStorage:{getItem:()=>null,setItem(){}},navigator:{clipboard:{writeText:async()=>{}}},
   document:{title:'',addEventListener(){},removeEventListener(){},querySelector:()=>null,createElement:()=>({setAttribute(){},addEventListener(){},remove(){}}),body:{append(){}},activeElement:null},
   fetch:async(url,options)=>{const body=options?.body?JSON.parse(options.body):null;if(body)posts.push({url,body});
-   const v=sample(vision);if(body?.action==='save'&&!body.id)v.saved_id='e1';if(url.endsWith('/figure'))v.figure_result={figure_id:'f3',kind:'table',notice:''};
+   const v=sample(vision);if(body?.action==='save'&&!body.id)v.saved_id='e1';if(url.endsWith('/figure'))v.figure_result=body?.inline?{figure_id:'ab'.repeat(16),kind:'image',notice:'',url:'/api/experiments/figure?id='+'ab'.repeat(16)}:{figure_id:'f3',kind:'table',notice:''};
    if(url.endsWith('/vision'))return {ok:true,status:200,json:async()=>({...v.vision,ready:true,model:'gpt-4o'})};
    return {ok:true,status:200,json:async()=>v}}};
  ctx.window={addEventListener(){},toast(){},UII18N:null};
@@ -147,4 +147,43 @@ test('a new experiment can carry attachments that upload after it is saved',asyn
  for(let i=0;i<6;i++)await tick();
  const uploads=posts.filter(p=>p.url.endsWith('/figure'));
  assert.deepEqual(uploads.map(p=>[p.body.experiment_id,p.body.filename]),[['e1','arch.png'],['e1','report.pdf']]);
+});
+
+test('each text box in the experiment form can take images with a caption, saved with the text',async()=>{
+ const {ctx,root,posts,click}=sandbox();ctx.window.renderExperiments(root);await tick();
+ await click({lab:'new'});
+ for(const k of ['data','model','results','conclusion','paths','notes'])assert.ok(root.innerHTML.includes(`data-inline-file="${k}"`),'image tool under '+k);
+ assert.ok(!root.innerHTML.includes('data-inline-file="directory"'),'single-line path field stays plain');
+ root.oninput({target:{dataset:{m:'exp',inlineField:'model'},name:'model',value:'编码器结构：',type:'textarea',closest:()=>null}});
+ root.onchange({target:{dataset:{inlineFile:'model'},files:[{name:'arch.png',type:'image/png',size:10}],value:'x',closest:()=>null}});
+ for(let i=0;i<4;i++)await tick();
+ const up=posts.find(p=>p.body.inline);
+ assert.deepEqual({inline:up.body.inline,field:up.body.field,experiment_id:up.body.experiment_id},{inline:true,field:'model',experiment_id:''});
+ const fid='ab'.repeat(16);
+ assert.ok(root.innerHTML.includes(`data-inline-desc="${fid}"`),'caption box under the text');
+ root.oninput({target:{dataset:{inlineDesc:fid,field:'model'},value:'整体结构 [左边] 是编码器',closest:()=>null}});
+ root.oninput({target:{dataset:{m:'exp'},name:'title',value:'新实验',type:'text',closest:()=>null}});
+ await root.onsubmit({preventDefault(){},target:{id:'lab-editor'}});await tick();
+ const save=posts.find(p=>p.body.action==='save');
+ assert.equal(save.body.experiment.model,`编码器结构：\n![整体结构 [左边 是编码器](figure:${fid})\n`,'image marker and caption are stored inside the text');
+});
+
+test('saved text shows the images in place with their captions',async()=>{
+ const {ctx,root}=sandbox();
+ const fid='cd'.repeat(16);
+ const orig=ctx.fetch;ctx.fetch=async(url,o)=>{const r=await orig(url,o);const v=await r.json();v.experiments[0].model='结构：\n![编码器接解码器](figure:'+fid+')\n后面的分析';v.experiments[0].figures.push({id:fid,experiment_id:'e1',kind:'image',inline:true,field:'model',title:'',caption:'编码器接解码器',table:null,analysis:null,url:'/api/experiments/figure?id='+fid,revision:1});return {ok:true,status:200,json:async()=>v}};
+ ctx.window.renderExperiments(root);await tick();
+ assert.ok(root.innerHTML.includes('class="lab-inline-figure"'),'image rendered inside the field');
+ assert.ok(root.innerHTML.includes('<figcaption>编码器接解码器</figcaption>'));
+ assert.ok(!root.innerHTML.includes('lab-figure-'+fid),'inline image is not repeated in the attachment gallery');
+});
+
+test('cancelling a new experiment removes the images uploaded into it',async()=>{
+ const {ctx,root,posts,click}=sandbox();ctx.window.renderExperiments(root);await tick();
+ await click({lab:'new'});
+ root.onchange({target:{dataset:{inlineFile:'results'},files:[{name:'wer.png',type:'image/png',size:10}],value:'x',closest:()=>null}});
+ for(let i=0;i<4;i++)await tick();
+ await click({lab:'edit-cancel'});await tick();
+ assert.equal(posts.at(-1).body.action,'delete');
+ assert.equal(posts.at(-1).body.id,'ab'.repeat(16));
 });

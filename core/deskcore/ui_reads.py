@@ -94,14 +94,8 @@ def cards(desk,workspace):
             item['topics']=[r['name'] for r in topics[item['id']]]
             item['topic_groups']={k:[r['name'] for r in topics[item['id']] if r['category']==k] for k in desk.TOPIC_CATEGORIES}
         else:item['topics']=item['tags']
-        ds=provenance[item['id']];actual=[d for d in ds if d['source_id'] in source_types];clean={}
-        for d in actual or ds:
-            typ=source_types.get(d['source_id'])
-            platform={'arxiv':'arXiv','hf':'Hugging Face Daily Papers','alphaxiv':'alphaXiv'}.get(typ,d['name'])
-            if not typ and (d['name']=='arXiv' or 'cs.SD' in d['name'] or 'eess.AS' in d['name']):platform='arXiv'
-            if not typ and 'Hugging' in d['name']:platform='Hugging Face Daily Papers'
-            clean[(platform,d['source_group'])]={**d,'platform':platform}
-        item.update(discoveries=list(clean.values()),heat=heat.get(item['id']),_detail_loaded=False,_incremental_collected=item['id'] in incremental)
+        found=discovery_list(provenance[item['id']],source_types)
+        item.update(discoveries=found,heat=heat.get(item['id']),_detail_loaded=False,_incremental_collected=item['id'] in incremental)
         result.append(item)
     if workspace=='research':
         fields=['id','title','body','tags','topics','authors','feedback']
@@ -114,6 +108,23 @@ def cards(desk,workspace):
             _preferences.clear() # one current local corpus, bounded memory
             _preferences[str(desk.DB)]=(key,{i['id']:{k:i.get(k) for k in ['preference_score','preference_details','recommendation_reason']} for i in result})
     return result
+
+
+def discovery_list(ds, source_types):
+    """一篇论文的来源（可能多个）：去重、标注平台，用户手动收录的排在前面。
+
+    采集来源以信息源列表为准，用来过滤早期迁移留下的 legacy 记录；
+    手动导入（链接、PDF、arXiv 号）没有对应的信息源，必须保留。
+    """
+    actual=[d for d in ds if d['source_id'] in source_types or d['source_group']=='manual' and not d['source_id'].startswith('legacy:')]
+    clean={}
+    for d in actual or ds:
+        typ=source_types.get(d['source_id'])
+        platform={'arxiv':'arXiv','hf':'Hugging Face Daily Papers','alphaxiv':'alphaXiv'}.get(typ,d['name'])
+        if not typ and (d['name']=='arXiv' or 'cs.SD' in d['name'] or 'eess.AS' in d['name']):platform='arXiv'
+        if not typ and 'Hugging' in d['name']:platform='Hugging Face Daily Papers'
+        clean[(platform,d['source_group'])]={**d,'platform':platform}
+    return sorted(clean.values(),key=lambda d:(d['source_group']!='manual',d.get('found','')))
 
 
 def compact(item):

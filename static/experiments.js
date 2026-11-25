@@ -144,7 +144,15 @@ const dictionary={
 '保存实验后会自动上传这些附件。截图可以直接粘贴（⌘V）到表单里，也可以拖进来或选择图片 / PDF。':'These upload automatically when you save the experiment. Paste a screenshot (⌘V) into the form, drop files here, or choose an image / PDF.',
 '移除':'Remove',
 '已加入，保存实验后上传':'Added. Uploads when you save the experiment',
-'个附件待上传':' attachment(s) to upload'
+'个附件待上传':' attachment(s) to upload',
+'插入图片':'Insert image',
+'也可以直接粘贴截图（⌘V）':'Or paste a screenshot (⌘V)',
+'这张图是干嘛的？例如：消融结果，去掉对齐损失后 WER 上升':'What is this image for? e.g. ablation: WER rises without the alignment loss',
+'文字里只能插图片；PDF 请放到“图片与附件”里':'Only images can go inside text. Put PDFs under “Images & attachments”.',
+'图片已插入，写一句说明吧':'Image inserted. Add a line about what it shows.',
+'正在插入图片…':'Inserting image…',
+'移除这张图':'Remove this image',
+'图片说明':'Image caption'
 };
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const tr=s=>window.UII18N?.locale()==='en-US'?(dictionary[s]||s):s;
@@ -164,6 +172,8 @@ let root=null,data=null,loading=false,error='',day=today(),tab='experiments',fil
 let capture='',target='',drafts=null,batch='';
 let editing=null,variantEdit=null,linkDraft=null,paperEdit=null,logFor=null,logText='',armed=null,armTimer=0;
 let reportText='',reportRevision=null,reportDirty=false,reportNote='';
+const INLINE_FIELDS=['data','model','results','conclusion','paths','notes'],INLINE_TOKEN=/!\[([^\]\n]*)\]\(figure:([0-9a-f]{32})\)/g;
+const inlineUploads=new Set(),inlineMeta={};let inlineBusy='';
 let pendingFiles=[],figureEdit=null,visionDraft=null,visionOpen=false,pasteTarget='';const figureModes={},working=new Set();
 const FIGURE_MODES={auto:'自动判断',image:'存为图片',table:'转成表格'},MAX_IMAGE=10*1024*1024,MAX_PDF=15*1024*1024,IMAGE_TYPES=['image/png','image/jpeg','image/gif','image/webp'],FILE_TYPES=[...IMAGE_TYPES,'application/pdf'];
 
@@ -197,8 +207,22 @@ function gotoDay(next){if(!next||next===day)return;stash();reportDirty=false;rep
 function options(map,value){return Object.entries(map).map(([k,l])=>`<option value="${k}" ${k===value?'selected':''}>${esc(tr(l))}</option>`).join('')}
 function expOptions(value,{blank='未归类',fresh=false,skip=''}={}){return `<option value="">${esc(tr(blank))}</option>${fresh?`<option value="__new" ${value==='__new'?'selected':''}>${esc(tr('＋ 新建实验'))}</option>`:''}${exps().filter(e=>e.id!==skip).map(e=>`<option value="${esc(e.id)}" ${e.id===value?'selected':''}>${esc(e.title)}</option>`).join('')}`}
 function field(label,name,value,model,{type='text',rows=0,hint='',required=false,max=''}={}){
- const attrs=`name="${name}" data-m="${model}" ${required?'required':''} ${max?`maxlength="${max}"`:''} placeholder="${esc(tr(hint))}"`;
- return `<label class="lab-field">${esc(tr(label))}${rows?`<textarea ${attrs} rows="${rows}">${esc(value)}</textarea>`:`<input type="${type}" ${attrs} value="${esc(value)}">`}</label>`;
+ const inline=model==='exp'&&rows&&INLINE_FIELDS.includes(name);
+ const attrs=`name="${name}" data-m="${model}" ${inline?`data-inline-field="${name}"`:''} ${required?'required':''} ${max?`maxlength="${max}"`:''} placeholder="${esc(tr(hint))}"`;
+ const box=`<label class="lab-field">${esc(tr(label))}${rows?`<textarea ${attrs} rows="${rows}">${esc(value)}</textarea>`:`<input type="${type}" ${attrs} value="${esc(value)}">`}</label>`;
+ if(!inline)return box;
+ return `<div class="lab-inline-field">${box}<div class="lab-inline-tools"><label class="lab-inline-add ${inlineBusy===name?'is-busy':''}">${esc(tr(inlineBusy===name?'正在插入图片…':'插入图片'))}<input type="file" accept="${IMAGE_TYPES.join(',')}" multiple data-inline-file="${name}" hidden></label><span>${esc(tr('也可以直接粘贴截图（⌘V）'))}</span></div>${inlineStripHTML(name,value)}</div>`;
+}
+const tokenIds=text=>[...String(text||'').matchAll(INLINE_TOKEN)].map(m=>m[2]);
+function inlineUrl(fid){if(inlineMeta[fid])return inlineMeta[fid];for(const e of exps())for(const f of e.figures||[])if(f.id===fid)return f.url;return ''}
+function inlineStripHTML(name,text){
+ const items=[...String(text||'').matchAll(INLINE_TOKEN)];
+ return `<div class="lab-inline-strip" id="lab-inline-strip-${name}" data-ids="${esc(items.map(m=>m[2]).join(','))}">${items.map(([,desc,fid])=>`<div class="lab-inline-item">${inlineUrl(fid)?`<img src="${esc(inlineUrl(fid))}" alt="">`:'<span class="lab-inline-missing"></span>'}<input data-inline-desc="${fid}" data-field="${name}" value="${esc(desc)}" maxlength="300" aria-label="${esc(tr('图片说明'))}" placeholder="${esc(tr('这张图是干嘛的？例如：消融结果，去掉对齐损失后 WER 上升'))}"><button type="button" class="lab-link" data-lab="inline-remove" data-fid="${fid}" data-field="${name}" aria-label="${esc(tr('移除这张图'))}">×</button></div>`).join('')}</div>`;
+}
+function richText(text,e){
+ const figs=new Map((e.figures||[]).map(f=>[f.id,f]));
+ return esc(text).replace(INLINE_TOKEN,(m,desc,fid)=>{const f=figs.get(fid);if(!f)return '';
+  return `<figure class="lab-inline-figure"><button type="button" class="lab-inline-thumb" data-lab="figure-view" data-fid="${fid}" aria-label="${esc(tr('查看大图'))}"><img src="${esc(f.url)}" alt="${desc}" loading="lazy"></button>${desc?`<figcaption>${desc}</figcaption>`:''}</figure>`});
 }
 
 function draftsHTML(){
@@ -224,7 +248,7 @@ function captureHTML(){
 }
 
 function factsHTML(e){
- return `<dl class="lab-facts">${INFO.map(([k,l])=>`<div class="lab-fact ${e[k]?'':'is-empty'}"><dt>${esc(tr(l))}</dt><dd class="${['directory','paths'].includes(k)?'mono':''}">${e[k]?esc(e[k]):esc(tr('未填写'))}${k==='directory'&&e[k]?` <button type="button" class="lab-link" data-lab="copy" data-text="${esc(e[k])}">${esc(tr('复制'))}</button>`:''}</dd></div>`).join('')}${e.notes?`<div class="lab-fact"><dt>${esc(tr('备注'))}</dt><dd>${esc(e.notes)}</dd></div>`:''}</dl>`;
+ return `<dl class="lab-facts">${INFO.map(([k,l])=>`<div class="lab-fact ${e[k]?'':'is-empty'}"><dt>${esc(tr(l))}</dt><dd class="${['directory','paths'].includes(k)?'mono':''}">${e[k]?(INLINE_FIELDS.includes(k)?richText(e[k],e):esc(e[k])):esc(tr('未填写'))}${k==='directory'&&e[k]?` <button type="button" class="lab-link" data-lab="copy" data-text="${esc(e[k])}">${esc(tr('复制'))}</button>`:''}</dd></div>`).join('')}${e.notes?`<div class="lab-fact"><dt>${esc(tr('备注'))}</dt><dd>${richText(e.notes,e)}</dd></div>`:''}</dl>`;
 }
 function variantFormHTML(){const v=variantEdit;
  return `<form id="lab-variant-form" class="lab-inline-form"><div class="lab-pair">${field('变体名称','name',v.name,'variant',{required:true,max:200,hint:'例如 lr=1e-4、去掉对齐损失'})}<label class="lab-field">${esc(tr('这次尝试'))}<select name="verdict" data-m="variant">${options(VERDICT,v.verdict)}</select></label></div>
@@ -273,7 +297,7 @@ function figureHTML(f,e){if(figureEdit?.id===f.id)return figureEditorHTML(f);
  const actions=`<div class="lab-figure-actions">${f.experiment_id?'':`<select data-figure-move="${esc(f.id)}" aria-label="${esc(tr('放到哪个实验…'))}">${expOptions('',{blank:'放到哪个实验…'})}</select>`}${isTable&&f.experiment_id?`<button type="button" class="lab-link" data-lab="figure-results" data-fid="${esc(f.id)}">${esc(tr('写入结果'))}</button>`:''}${isTable?`<button type="button" class="lab-link" data-lab="figure-view" data-fid="${esc(f.id)}">${esc(tr('查看原图'))}</button><button type="button" class="lab-link" data-lab="figure-kind" data-kind="image" data-fid="${esc(f.id)}">${esc(tr('改存为图片'))}</button>`:`${f.table?`<button type="button" class="lab-link" data-lab="figure-kind" data-kind="table" data-fid="${esc(f.id)}">${esc(tr('改回表格'))}</button>`:vision?`<button type="button" class="lab-link" data-lab="figure-analyze" data-fid="${esc(f.id)}" ${busyHere?'disabled':''}>${esc(tr(busyHere?'正在识别表格…':'转成表格'))}</button>`:''}`}<button type="button" class="lab-link" data-lab="figure-edit" data-fid="${esc(f.id)}">${esc(tr('编辑'))}</button><button type="button" class="lab-link danger" data-lab="figure-delete" data-fid="${esc(f.id)}">${esc(tr(armed===key?'确认删除这张图':'删除图片'))}</button></div>`;
  return `<figure class="lab-figure ${isTable?'is-table':'is-image'}" id="lab-figure-${esc(f.id)}">${isTable?'':`<button type="button" class="lab-figure-thumb" data-lab="figure-view" data-fid="${esc(f.id)}" aria-label="${esc(tr('查看大图'))}"><img src="${esc(f.url)}" alt="${esc(f.title||tr('图片'))}" loading="lazy"></button>`}
  <figcaption><span class="lab-figure-kind">${esc(tr(isTable?'表格':'图片'))}</span>${f.title?`<strong>${esc(f.title)}</strong>`:''}${f.caption?`<span>${esc(f.caption)}</span>`:''}</figcaption>${isTable?tableHTML(f.table):''}${meta}${actions}</figure>`}
-function figuresHTML(e){const list=e.figures||[],mode=figureModes[e.id]||'auto',up=working.has('up:'+e.id),vision=data.vision?.ready;
+function figuresHTML(e){const list=(e.figures||[]).filter(f=>!f.inline),mode=figureModes[e.id]||'auto',up=working.has('up:'+e.id),vision=data.vision?.ready;
  return `<section class="lab-figures ${pasteTarget===e.id?'is-target':''}" data-drop="${esc(e.id)}" tabindex="0" aria-label="${esc(tr('图表'))}"><div class="lab-figures-head"><h4>${esc(tr('图表'))}${list.length?` <small>${list.length}</small>`:''}</h4><div class="lab-figures-tools"><select data-figure-mode="${esc(e.id)}" aria-label="${esc(tr('保存方式'))}">${options(FIGURE_MODES,mode)}</select><label class="lab-upload secondary ${up?'is-busy':''}">${esc(tr(up?'正在上传并解析…':'上传图片 / PDF'))}<input type="file" accept="${FILE_TYPES.join(',')}" multiple data-figure-file="${esc(e.id)}" ${up?'disabled':''} hidden></label></div></div>
  ${list.length?`<div class="lab-figure-grid">${list.map(f=>figureHTML(f,e)).join('')}</div>`:''}
  <p class="lab-hint">${esc(tr('截图可以直接粘贴（⌘V）或拖进来；也可以选择图片或 PDF 文件。结果表格会转成可编辑表格，模型图、曲线图默认保存为图片，PDF 原样保存为附件。'))}${vision?'':` ${esc(tr('还没配置视觉模型：图片会直接保存，配置后可以转成表格。'))} <button type="button" class="lab-link" data-lab="vision-open">${esc(tr('去设置'))}</button>`}</p></section>`}
@@ -328,8 +352,10 @@ function reportHTML(){const loose=data.logs.filter(l=>!l.experiment_id);
 function bind(){root.onclick=handle;root.oninput=input;root.onchange=change;root.onsubmit=submit;
  root.ondragover=e=>{const zone=e.target.closest?.('[data-drop]');if(!zone||!e.dataTransfer?.types?.includes('Files'))return;e.preventDefault();zone.classList.add('is-dragging')};
  root.ondragleave=e=>{const zone=e.target.closest?.('[data-drop]');if(zone&&!zone.contains(e.relatedTarget))zone.classList.remove('is-dragging')};
- root.ondrop=e=>{const zone=e.target.closest?.('[data-drop]');if(!zone)return;e.preventDefault();zone.classList.remove('is-dragging');pasteTarget=zone.dataset.drop;uploadImages(zone.dataset.drop,[...(e.dataTransfer?.files||[])])}}
+ root.ondrop=e=>{const inlineBox=e.target.closest?.('textarea[data-inline-field]');if(inlineBox&&editing){e.preventDefault();insertInline(inlineBox.dataset.inlineField,[...(e.dataTransfer?.files||[])]);return}
+ const zone=e.target.closest?.('[data-drop]');if(!zone)return;e.preventDefault();zone.classList.remove('is-dragging');pasteTarget=zone.dataset.drop;uploadImages(zone.dataset.drop,[...(e.dataTransfer?.files||[])])}}
 document.addEventListener('paste',e=>{if(!active())return;const files=[...(e.clipboardData?.files||[])].filter(f=>FILE_TYPES.includes(f.type));if(!files.length)return;
+ const inlineBox=e.target.closest?.('textarea[data-inline-field]');if(inlineBox&&editing){e.preventDefault();insertInline(inlineBox.dataset.inlineField,files);return}
  if(e.target.closest?.('textarea,input')&&!e.target.closest('[data-drop]'))return;
  const zone=dropTarget(document.activeElement)||pasteTarget,target=zone;
  e.preventDefault();uploadImages(target==='__new'&&editing&&!editing.id||target==='__capture'||expById(target)?target:'__capture',files)});
@@ -356,17 +382,20 @@ function input(e){
  if(el.id==='lab-target'){target=el.value;return}
  if(el.dataset.pexp&&paperEdit){(paperEdit.links[el.dataset.pexp]||={on:false,note:''}).on=el.checked;return}
  if(el.dataset.pnote&&paperEdit){const link=(paperEdit.links[el.dataset.pnote]||={on:false,note:''});link.note=el.value;if(el.value&&!link.on){link.on=true;const box=root.querySelector('[data-pexp="'+el.dataset.pnote+'"]');if(box)box.checked=true}return}
+ if(el.dataset.inlineDesc&&editing){const k=el.dataset.field,fid=el.dataset.inlineDesc,desc=el.value.replace(/\n/g,' ').replace(/\]/g,'');editing[k]=(editing[k]||'').replace(new RegExp('!\\[[^\\]\\n]*\\]\\(figure:'+fid+'\\)'),()=>`![${desc}](figure:${fid})`);const ta=root.querySelector?.(`textarea[data-inline-field="${k}"]`);if(ta)ta.value=editing[k];return}
  if(el.dataset.fcell&&figureEdit?.table){const [r,c]=el.dataset.fcell.split(',').map(Number);if(r<0)figureEdit.table.columns[c]=el.value;else figureEdit.table.rows[r][c]=el.value;return}
  const draft=el.closest('[data-draft]');
  if(draft&&drafts&&el.name){const d=drafts[Number(draft.dataset.draft)];if(d)d[el.name]=el.value;return}
  const model=models[el.dataset.m]?.();
  if(model&&el.name)model[el.name]=el.type==='checkbox'?el.checked:el.value;
+ if(el.dataset.inlineField){const strip=root.querySelector?.('#lab-inline-strip-'+el.name);if(strip&&strip.dataset.ids!==tokenIds(el.value).join(','))strip.outerHTML=inlineStripHTML(el.name,el.value)}
 }
 function change(e){
  if(!active())return;const el=e.target;
  if(el.id==='lab-day'){gotoDay(el.value);return}
  if(el.dataset.figureMode){figureModes[el.dataset.figureMode]=el.value;return}
  if(el.dataset.figureMove){if(el.value)figureCall({action:'move',id:el.dataset.figureMove,experiment_id:el.value},el.dataset.figureMove).then(v=>{if(v)flash(tr('图片已移动'))});return}
+ if(el.dataset.inlineFile){const files=[...el.files];el.value='';insertInline(el.dataset.inlineFile,files);return}
  if(el.dataset.figureFile){const files=[...el.files];el.value='';uploadImages(el.dataset.figureFile,files);return}
  if(el.closest('#lab-vision')&&el.tagName==='SELECT'&&visionDraft&&el.name){visionDraft[el.name]=el.value;return}
  if(el.dataset.move){post({action:'log-move',id:el.dataset.move,experiment_id:el.value});return}
@@ -381,7 +410,8 @@ async function submit(e){
   if(await post({action:'apply',entries,batch})){drafts=null;capture='';flash(tr('已记录到各个实验'));paint()}
  }else if(id==='lab-editor'){
   const {id:experimentId,revision,...experiment}=editing;
-  if(await post({action:'save',id:experimentId,revision,experiment})){editing=null;flash(tr('实验已保存'));const queued=pendingFiles.map(p=>p.file),savedId=data.saved_id;clearPending();paint();
+  const {figures:_figures,variants:_variants,links:_links,papers:_papers,log_count:_lc,last_day:_ld,created:_c,updated:_u,...fields}=experiment;
+  if(await post({action:'save',id:experimentId,revision,experiment:fields})){editing=null;inlineUploads.clear();flash(tr('实验已保存'));const queued=pendingFiles.map(p=>p.file),savedId=data.saved_id;clearPending();paint();
    if(queued.length&&savedId){figureModes[savedId]=figureModes.__new||'auto';await uploadImages(savedId,queued)}}
  }else if(id==='lab-variant-form'){
   const {id:variantId,experiment_id,...variant}=variantEdit;
@@ -426,6 +456,28 @@ async function uploadImages(zone,files){
  }
  paint();
 }
+async function insertInline(name,files){
+ if(!editing)return;
+ const images=files.filter(f=>f&&f.type?.startsWith('image/'));
+ if(!images.length){flash(tr('文字里只能插图片；PDF 请放到“图片与附件”里'),true);paint();return}
+ const box=root.querySelector?.(`textarea[data-inline-field="${name}"]`);
+ let pos=box&&Number.isInteger(box.selectionStart)?box.selectionStart:(editing[name]||'').length,last='';
+ inlineBusy=name;paint();
+ try{
+  for(const file of images){
+   if(!IMAGE_TYPES.includes(file.type)){flash(tr('只支持图片（PNG、JPEG、GIF、WebP）和 PDF'),true);continue}
+   if(file.size>MAX_IMAGE){flash(tr('图片超过 10 MB，请压缩或截取需要的部分后再上传'),true);continue}
+   let v;try{v=await request('/api/experiments/figure',{day,action:'upload',experiment_id:editing.id||'',inline:true,field:name,filename:file.name||'',data:await readImage(file)})}
+   catch(err){flash(err.message,true);continue}
+   const r=v.figure_result;accept(v);inlineUploads.add(r.figure_id);inlineMeta[r.figure_id]=r.url;last=r.figure_id;
+   const text=editing[name]||'',before=text.slice(0,pos),after=text.slice(pos);
+   const token=(before&&!before.endsWith('\n')?'\n':'')+`![](figure:${r.figure_id})`+(after.startsWith('\n')?'':'\n');
+   editing[name]=before+token+after;pos=(before+token).length;
+  }
+ }finally{inlineBusy='';paint()}
+ if(last){flash(tr('图片已插入，写一句说明吧'));root.querySelector?.(`[data-inline-desc="${last}"]`)?.focus()}
+}
+function dropInline(fid){if(inlineUploads.has(fid)){inlineUploads.delete(fid);request('/api/experiments/figure',{day,action:'delete',id:fid}).catch(()=>{})}}
 function figureById(fid){for(const e of exps())for(const f of e.figures||[])if(f.id===fid)return {f,e};const f=(data?.loose_figures||[]).find(x=>x.id===fid);return f?{f,e:null}:{}}
 function viewImage(f){
  document.querySelector('.lab-lightbox')?.remove();
@@ -463,8 +515,9 @@ async function handle(e){
   case 'draft-remove':drafts.splice(Number(b.dataset.index),1);if(!drafts.length)drafts=null;paint();break;
   case 'draft-cancel':drafts=null;paint();break;
   case 'new':tab='experiments';editing={title:'',status:'active',agent:'',directory:'',data:'',model:'',results:'',conclusion:'',paths:'',notes:''};paint();reveal('#lab-editor');break;
-  case 'edit':if(experiment){editing={...experiment};paint()}break;
-  case 'edit-cancel':editing=null;clearPending();paint();break;
+  case 'edit':if(experiment){editing={...experiment};inlineUploads.clear();paint()}break;
+  case 'edit-cancel':editing=null;clearPending();for(const fid of [...inlineUploads])dropInline(fid);paint();break;
+  case 'inline-remove':if(editing){const k=b.dataset.field,fid=b.dataset.fid;editing[k]=(editing[k]||'').replace(new RegExp('\\n?!\\[[^\\]\\n]*\\]\\(figure:'+fid+'\\)'),'');dropInline(fid);paint()}break;
   case 'pending-remove':{const [p]=pendingFiles.splice(Number(b.dataset.index),1);if(p?.preview)globalThis.URL?.revokeObjectURL?.(p.preview);paint();break}
   case 'delete':if(experiment&&arm('exp:'+id)&&await post({action:'delete',id,revision:experiment.revision})){editing=null;flash(tr('实验已删除，记录保留在“未归类”'));paint()}break;
   case 'toggle':if(experiment)await post({action:'toggle-done',id,revision:experiment.revision});break;

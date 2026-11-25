@@ -274,10 +274,14 @@ def save(desk, data):
                 checked_row(c, 'lab_experiments', data['id'], data.get('revision'), gone, stale)
                 c.execute('UPDATE lab_experiments SET ' + ','.join(k + '=?' for k in values)
                           + ',updated=?,revision=revision+1 WHERE id=?', (*values.values(), stamp(), data['id']))
+                from . import figures as FIGURES
+                FIGURES.sync_inline(c, data['id'], values)
             else:
                 c.execute('INSERT INTO lab_experiments(id,' + ','.join(values) + ',created,updated) VALUES('
                           + ','.join('?' for _ in range(len(values) + 3)) + ')',
                           (saved_id := uuid.uuid4().hex, *values.values(), stamp(), stamp()))
+                from . import figures as FIGURES
+                FIGURES.sync_inline(c, saved_id, values)
         elif action == 'toggle-done':
             row = checked_row(c, 'lab_experiments', data.get('id'), data.get('revision'), gone, stale)
             c.execute('UPDATE lab_experiments SET status=?,updated=?,revision=revision+1 WHERE id=?',
