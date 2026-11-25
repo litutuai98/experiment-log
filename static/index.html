@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>实验记录 · 本地知识工作台</title>
+<link rel="icon" href="/favicon.svg">
+<link rel="stylesheet" href="/style.css?v=20261124l">
+</head>
+<body data-section="lab">
+<div class="app-topbar">
+  <a class="brand" href="/" aria-label="实验记录"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect width="32" height="32" rx="8" fill="#2a4d85"/><rect x="10" y="5.5" width="15" height="17.5" rx="2.5" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="1.8"/><rect x="7" y="9" width="15" height="17.5" rx="2.5" fill="#2a4d85" stroke="#fff" stroke-width="1.8"/><path d="M10.5 18h8M10.5 21.8h5" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/><path d="M15.5 9v6.4l2-1.6 2 1.6V9z" fill="#ef6a4f"/></svg></a>
+  <nav class="app-sections" aria-label="项目"><button class="active" type="button"><span class="section-icon"><svg class="i"><use href="#i-flask"/></svg></span><span>实验记录<small>实验、变体、论文与日报</small></span></button></nav>
+</div>
+<main>
+  <header><div class="breadcrumb"><b>实验记录</b></div></header>
+  <section id="content" tabindex="-1" aria-live="polite"></section>
+</main>
+<svg xmlns="http://www.w3.org/2000/svg" class="icon-sprite" aria-hidden="true" focusable="false">
+  <symbol id="i-flask" viewBox="0 0 24 24"><path d="M9.5 3h5M10.5 3v6.2L5.2 18a2 2 0 0 0 1.7 3h10.2a2 2 0 0 0 1.7-3l-5.3-8.8V3"/><path d="M7.6 15h8.8"/></symbol>
+</svg>
+<script src="/experiments.js?v=20261124l"></script>
+<script>window.renderExperiments(document.getElementById('content'));</script>
+</body>
+</html>
