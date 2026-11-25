@@ -5,7 +5,7 @@ import json
 import os
 from pathlib import Path
 
-SECRET_FIELDS=('api_key','scholar_key','search_api_key')
+SECRET_FIELDS=('api_key','scholar_key','search_api_key','vision_api_key')
 RETIRED_FIELDS=('multi_agent_enabled','multi_agent_mode','agent_models','agent_explainer_key','agent_reviewer_key','agent_verifier_key')
 class Keychain:
     def __init__(self):

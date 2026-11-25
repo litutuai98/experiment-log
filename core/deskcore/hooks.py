@@ -27,6 +27,7 @@ POST_ROUTES = {}
 PREFIX_GET = []        # (regex, project_id, fn(handler, payload, match))
 TASKS = []             # fn() -> list[dict] — 任务中心的额外来源
 FAILURES = []          # [{'stage','project','error','frames'}]
+RAW = object()         # 路由已自行写出响应（例如图片字节），dispatch 不再包装成 JSON
 
 
 def register_project(project_id, name, static_dir=None, ok=True, error=''):
@@ -73,6 +74,8 @@ def dispatch(handler, method, path, payload):
     project, fn = entry
     try:
         result = fn(handler, payload) if match is None else fn(handler, payload, match)
+        if result is RAW:
+            return True
         if isinstance(result, tuple):
             handler.reply(result[0], result[1])
         else:

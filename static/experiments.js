@@ -66,7 +66,85 @@ const dictionary={
 '实验已保存':'Experiment saved','变体已保存':'Variant saved','关联已保存':'Link saved','论文已保存':'Paper saved','实验已删除，记录保留在“未归类”':'Experiment deleted; its entries are now unassigned',
 'AI 草稿已填入，确认后点“保存日报”。':'AI draft added. Review it, then save the report.','草稿已填入，确认后点“保存日报”。':'Draft added. Review it, then save the report.','日报已保存':'Report saved',
 '记录日期':'Date',
-'切换日期会同时切换：每张实验卡片下的当天记录、“未归类”记录、以及右侧的日报。':'Changing the date switches the day’s entries under each experiment, the unassigned entries, and the report on the right.'
+'切换日期会同时切换：每张实验卡片下的当天记录、“未归类”记录、以及右侧的日报。':'Changing the date switches the day’s entries under each experiment, the unassigned entries, and the report on the right.',
+'图表':'Figures & tables',
+'添加图片':'Add image',
+'自动判断':'Auto-detect',
+'存为图片':'Keep as image',
+'转成表格':'Convert to table',
+'保存方式':'Save as',
+'拖入、粘贴或选择截图。结果表格会转成可编辑表格，模型图、曲线图默认保存为图片。':'Drop, paste or choose a screenshot. Result tables become editable tables; model diagrams and plots stay as images.',
+'还没配置视觉模型：图片会直接保存，配置后可以转成表格。':'No vision model yet: images are saved as-is. Set one up to convert tables.',
+'去设置':'Set up',
+'正在上传并解析…':'Uploading and reading…',
+'正在识别表格…':'Reading the table…',
+'查看大图':'View full size',
+'查看原图':'View original',
+'删除图片':'Delete image',
+'确认删除这张图':'Confirm: delete this image',
+'写入结果':'Add to results',
+'改存为图片':'Keep as image instead',
+'改回表格':'Show as table',
+'标题':'Title',
+'表头':'Header',
+'加一行':'Add row',
+'加一列':'Add column',
+'删除这一行':'Delete row',
+'保存':'Save',
+'视觉模型提示：':'Vision model notes: ',
+'识别：':'Read by ',
+'只支持 PNG、JPEG、GIF、WebP 图片':'Only PNG, JPEG, GIF and WebP images are supported',
+'图片超过 10 MB，请压缩或截取需要的部分后再上传':'The image is larger than 10 MB. Compress or crop it first.',
+'读取图片失败，请重新选择':'Could not read the image. Please choose it again.',
+'先点一下要放入的实验里的“图表”区域，再粘贴。':'Click the Figures area of the experiment first, then paste.',
+'已识别为表格':'Recognized as a table',
+'已保存为图片':'Saved as an image',
+'图表已更新':'Figure updated',
+'图片已删除':'Image deleted',
+'表格已写入结果':'Table added to results',
+'表格已更新':'Table updated',
+'图片解析模型':'Image reading model',
+'已配置':'Ready',
+'未配置':'Not set up',
+'默认直接用“AI 设置”里的模型（deepseek-flash 可以读图）。想换成别的读图模型，例如通义千问 VL、GPT-4o、Claude、Gemini，再在这里填写。':'By default this uses the model from AI settings (deepseek-flash can read images). Fill this in only to use a different image model, such as Qwen-VL, GPT-4o, Claude or Gemini.',
+'服务地址':'Service URL',
+'留空则使用“AI 设置”里的服务地址和 Key':'Leave empty to use the service and key from AI settings',
+'模型名称':'Model name',
+'例如 qwen-vl-max、gpt-4o、claude-sonnet-4-5':'e.g. qwen-vl-max, gpt-4o, claude-sonnet-4-5',
+'接口协议':'API protocol',
+'自动':'Auto',
+'OpenAI 兼容':'OpenAI-compatible',
+'Anthropic':'Anthropic',
+'已保存，留空表示不修改':'Saved. Leave empty to keep it',
+'保存视觉模型':'Save vision model',
+'清除视觉模型 Key':'Remove vision key',
+'视觉模型已保存':'Vision model saved',
+'视觉模型 Key 已清除':'Vision key removed',
+'图片和识别结果只保存在本机；解析时会把这张图片发给你配置的模型服务。':'Images and results stay on this computer. Reading an image sends it to the model service you configured.',
+'使用 AI 设置里的服务':'Uses the AI settings service',
+'关闭':'Close',
+'图片':'Image',
+'表格':'Table',
+'图片会放进上面选中的实验；选“未归类”就先放在右侧，之后再归类。也可以直接把截图粘贴到输入框里。':'Images go to the experiment selected above. With “Unassigned” they wait on the right until you file them. You can also paste a screenshot into the text box.',
+'未归类的图表':'Unassigned figures',
+'放到哪个实验…':'Move to experiment…',
+'图片已移动':'Image moved',
+'截图或图片':'Screenshots & images',
+'上传图片 / PDF':'Upload image / PDF',
+'只支持图片（PNG、JPEG、GIF、WebP）和 PDF':'Only images (PNG, JPEG, GIF, WebP) and PDF are supported',
+'PDF 超过 15 MB，请压缩或只保留需要的页面后再上传':'The PDF is larger than 15 MB. Compress it or keep only the pages you need.',
+'打开 PDF':'Open PDF',
+'PDF 附件':'PDF attachment',
+'已保存 PDF 附件':'PDF attachment saved',
+'截图可以直接粘贴（⌘V）或拖进来；也可以选择图片或 PDF 文件。结果表格会转成可编辑表格，模型图、曲线图默认保存为图片，PDF 原样保存为附件。':'Paste a screenshot (⌘V) or drop it here, or choose an image or PDF. Result tables become editable tables, model diagrams and plots stay as images, and PDFs are kept as attachments.',
+'放进上面选中的实验；选“未归类”就先放在右侧，之后再归类。截图可以直接粘贴到输入框里（⌘V），也可以选择图片或 PDF。':'Goes to the experiment selected above. With “Unassigned” it waits on the right until you file it. Paste a screenshot into the text box (⌘V), or choose an image or PDF.',
+'截图与附件':'Screenshots & attachments',
+'删除附件':'Delete attachment','确认删除这个附件':'Confirm: delete this attachment',
+'图片与附件':'Images & attachments',
+'保存实验后会自动上传这些附件。截图可以直接粘贴（⌘V）到表单里，也可以拖进来或选择图片 / PDF。':'These upload automatically when you save the experiment. Paste a screenshot (⌘V) into the form, drop files here, or choose an image / PDF.',
+'移除':'Remove',
+'已加入，保存实验后上传':'Added. Uploads when you save the experiment',
+'个附件待上传':' attachment(s) to upload'
 };
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const tr=s=>window.UII18N?.locale()==='en-US'?(dictionary[s]||s):s;
@@ -86,6 +164,8 @@ let root=null,data=null,loading=false,error='',day=today(),tab='experiments',fil
 let capture='',target='',drafts=null,batch='';
 let editing=null,variantEdit=null,linkDraft=null,paperEdit=null,logFor=null,logText='',armed=null,armTimer=0;
 let reportText='',reportRevision=null,reportDirty=false,reportNote='';
+let pendingFiles=[],figureEdit=null,visionDraft=null,visionOpen=false,pasteTarget='';const figureModes={},working=new Set();
+const FIGURE_MODES={auto:'自动判断',image:'存为图片',table:'转成表格'},MAX_IMAGE=10*1024*1024,MAX_PDF=15*1024*1024,IMAGE_TYPES=['image/png','image/jpeg','image/gif','image/webp'],FILE_TYPES=[...IMAGE_TYPES,'application/pdf'];
 
 const active=()=>root?.isConnected&&location.hash==='#lab';
 const exps=()=>data?.experiments||[];
@@ -135,9 +215,10 @@ function draftsHTML(){
  <div class="lab-buttons"><button class="primary" ${busy?'disabled':''}>${esc(tr('保存这些记录'))}</button><button type="button" class="secondary" data-lab="draft-cancel">${esc(tr('取消'))}</button></div></form>`;
 }
 function captureHTML(){
- return `<section class="lab-capture"><h2>${esc(tr('今天做了什么'))}</h2><p class="muted">${esc(tr('用自己的话写就行，可以一次说多个实验。例如：HEAT 把学习率改成 3e-4，dev WER 从 12.3 降到 11.9；说话人归属那边去掉对齐损失没用，掉了 0.4。'))}</p>
+ return `<section class="lab-capture" data-drop="__capture"><h2>${esc(tr('今天做了什么'))}</h2><p class="muted">${esc(tr('用自己的话写就行，可以一次说多个实验。例如：HEAT 把学习率改成 3e-4，dev WER 从 12.3 降到 11.9；说话人归属那边去掉对齐损失没用，掉了 0.4。'))}</p>
  <textarea id="lab-capture" rows="4" maxlength="8000" placeholder="${esc(tr('写下今天做的实验、结果和想法…'))}" aria-label="${esc(tr('今天做了什么'))}">${esc(capture)}</textarea>
  <div class="lab-buttons"><button type="button" class="primary" data-lab="organize" ${busy?'disabled':''}>${esc(tr(busy==='organize'?'正在分配…':'AI 分到各个实验'))}</button><span class="lab-or">${esc(tr('或'))}</span><select id="lab-target" aria-label="${esc(tr('记到哪个实验'))}">${expOptions(target)}</select><button type="button" class="secondary" data-lab="quick" ${busy?'disabled':''}>${esc(tr('直接记一条'))}</button></div>
+ <div class="lab-capture-image"><span class="lab-capture-image-label">${esc(tr('截图与附件'))}</span><select data-figure-mode="__capture" aria-label="${esc(tr('保存方式'))}">${options(FIGURE_MODES,figureModes.__capture||'auto')}</select><label class="lab-upload secondary ${working.has('up:__capture')?'is-busy':''}">${esc(tr(working.has('up:__capture')?'正在上传并解析…':'上传图片 / PDF'))}<input type="file" accept="${FILE_TYPES.join(',')}" multiple data-figure-file="__capture" ${working.has('up:__capture')?'disabled':''} hidden></label><span class="lab-hint">${esc(tr('放进上面选中的实验；选“未归类”就先放在右侧，之后再归类。截图可以直接粘贴到输入框里（⌘V），也可以选择图片或 PDF。'))}</span></div>
  <p class="lab-hint">${esc(tr(data.ai_available?'AI 只收到这段文字和实验名称、目录等概要，使用“AI 设置”里的模型；分配结果先给你确认，可以改完再保存。':'还没有配置 AI 模型，可以先用“直接记一条”手动记录。'))}</p>
  ${notice?`<p class="lab-notice ${noticeError?'is-error':''}" role="status">${esc(notice)}</p>`:''}${drafts?draftsHTML():''}</section>`;
 }
@@ -169,15 +250,46 @@ function logsHTML(e){const logs=data.logs.filter(l=>l.experiment_id===e.id);
  return `${logFor===e.id?`<form id="lab-log-form" class="lab-inline-form"><textarea id="lab-quicklog" rows="3" maxlength="10000" placeholder="${esc(tr('这个实验今天做了什么…'))}" aria-label="${esc(tr('记一条'))}">${esc(logText)}</textarea><div class="lab-buttons"><button class="primary" ${busy?'disabled':''}>${esc(tr('保存记录'))}</button><button type="button" class="secondary" data-lab="log-cancel">${esc(tr('取消'))}</button></div></form>`:''}${logs.length?`<section class="lab-block"><div class="lab-block-head"><h4>${esc(day)} ${esc(tr('的记录'))} · ${logs.length}</h4></div><ul class="lab-logs">${logs.map(l=>logItem(l,false)).join('')}</ul></section>`:''}`;
 }
 function editorHTML(){const e=editing,key='exp:'+e.id;
- return `<form id="lab-editor" class="lab-card lab-editor"><h3>${esc(tr(e.id?'编辑实验':'新建实验'))}</h3>
+ return `<form id="lab-editor" class="lab-card lab-editor" data-drop="${esc(e.id||'__new')}"><h3>${esc(tr(e.id?'编辑实验':'新建实验'))}</h3>
  <div class="lab-triple">${field('实验名称','title',e.title,'exp',{required:true,max:200,hint:'任务 + 方法，例如：流式多说话人 ASR · HEAT 条件'})}<label class="lab-field">${esc(tr('状态'))}<select name="status" data-m="exp">${options(STATUS,e.status)}</select></label>${field('负责的 Agent 或人','agent',e.agent,'exp',{max:100,hint:'例如 Codex、Claude、我自己'})}</div>
  ${INFO.map(([k,l,h])=>field(l,k,e[k],'exp',{rows:k==='directory'?0:3,hint:h})).join('')}${field('备注','notes',e.notes,'exp',{rows:2,hint:'其他想记下的事'})}
+ ${e.id?figuresHTML(expById(e.id)||e):pendingHTML()}
  <div class="lab-buttons"><button class="primary" ${busy?'disabled':''}>${esc(tr('保存实验'))}</button><button type="button" class="secondary" data-lab="edit-cancel">${esc(tr('取消'))}</button>${e.id?`<button type="button" class="lab-link lab-danger ${armed===key?'is-armed':''}" data-lab="delete" data-id="${esc(e.id)}">${esc(tr(armed===key?'确认删除：变体和关联会一并删除，记录保留':'删除实验'))}</button>`:''}</div></form>`;
 }
+function pendingHTML(){
+ return `<section class="lab-figures lab-pending" aria-label="${esc(tr('图片与附件'))}"><div class="lab-figures-head"><h4>${esc(tr('图片与附件'))}${pendingFiles.length?` <small>${pendingFiles.length}</small>`:''}</h4><div class="lab-figures-tools"><select data-figure-mode="__new" aria-label="${esc(tr('保存方式'))}">${options(FIGURE_MODES,figureModes.__new||'auto')}</select><label class="lab-upload secondary">${esc(tr('上传图片 / PDF'))}<input type="file" accept="${FILE_TYPES.join(',')}" multiple data-figure-file="__new" hidden></label></div></div>
+ ${pendingFiles.length?`<ul class="lab-pending-list">${pendingFiles.map((p,i)=>`<li>${p.preview?`<img src="${esc(p.preview)}" alt="">`:'<span class="lab-file-icon" aria-hidden="true">PDF</span>'}<span>${esc(p.file.name||tr('图片'))}</span><button type="button" class="lab-link" data-lab="pending-remove" data-index="${i}">${esc(tr('移除'))}</button></li>`).join('')}</ul>`:''}
+ <p class="lab-hint">${esc(tr('保存实验后会自动上传这些附件。截图可以直接粘贴（⌘V）到表单里，也可以拖进来或选择图片 / PDF。'))}</p></section>`}
+function clearPending(){for(const p of pendingFiles)if(p.preview)globalThis.URL?.revokeObjectURL?.(p.preview);pendingFiles=[]}
+function tableHTML(table){return `<div class="lab-table-wrap"><table class="lab-table"><thead><tr>${table.columns.map(c=>`<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${table.rows.map(r=>`<tr>${r.map(c=>`<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`}
+function figureEditorHTML(f){const d=figureEdit,table=d.kind==='table'&&d.table;
+ return `<form class="lab-figure lab-figure-form" id="lab-figure-form"><label>${esc(tr('标题'))}<input name="title" data-m="figure" maxlength="120" value="${esc(d.title)}"></label><label>${esc(tr('说明'))}<textarea name="caption" data-m="figure" rows="2" maxlength="1000">${esc(d.caption)}</textarea></label>
+ ${table?`<div class="lab-table-wrap"><table class="lab-table is-editing"><thead><tr>${table.columns.map((c,ci)=>`<th><input data-fcell="-1,${ci}" value="${esc(c)}" aria-label="${esc(tr('表头'))} ${ci+1}"></th>`).join('')}<th></th></tr></thead><tbody>${table.rows.map((r,ri)=>`<tr>${r.map((c,ci)=>`<td><input data-fcell="${ri},${ci}" value="${esc(c)}"></td>`).join('')}<td><button type="button" class="lab-link" data-lab="figure-row-del" data-row="${ri}" aria-label="${esc(tr('删除这一行'))}">×</button></td></tr>`).join('')}</tbody></table></div><div class="lab-buttons"><button type="button" class="secondary" data-lab="figure-row-add">${esc(tr('加一行'))}</button><button type="button" class="secondary" data-lab="figure-col-add">${esc(tr('加一列'))}</button></div>`:''}
+ <div class="lab-buttons"><button type="submit" class="primary">${esc(tr('保存'))}</button><button type="button" class="secondary" data-lab="figure-cancel">${esc(tr('取消'))}</button></div></form>`}
+function figureHTML(f,e){if(figureEdit?.id===f.id)return figureEditorHTML(f);
+ if(f.kind==='file'){const key='figure:'+f.id;return `<figure class="lab-figure is-file" id="lab-figure-${esc(f.id)}"><a class="lab-file" href="${esc(f.url)}" target="_blank" rel="noopener"><span class="lab-file-icon" aria-hidden="true">PDF</span><span class="lab-file-text"><strong>${esc(f.title||tr('PDF 附件'))}</strong><small>${(f.size/1024/1024).toFixed(f.size>1048576?1:2)} MB</small></span></a>${f.caption?`<figcaption><span>${esc(f.caption)}</span></figcaption>`:''}<div class="lab-figure-actions">${f.experiment_id?'':`<select data-figure-move="${esc(f.id)}" aria-label="${esc(tr('放到哪个实验…'))}">${expOptions('',{blank:'放到哪个实验…'})}</select>`}<a class="lab-link" href="${esc(f.url)}" target="_blank" rel="noopener">${esc(tr('打开 PDF'))}</a><button type="button" class="lab-link" data-lab="figure-edit" data-fid="${esc(f.id)}">${esc(tr('编辑'))}</button><button type="button" class="lab-link danger" data-lab="figure-delete" data-fid="${esc(f.id)}">${esc(tr(armed===key?'确认删除这个附件':'删除附件'))}</button></div></figure>`}
+ const vision=data.vision?.ready,isTable=f.kind==='table'&&f.table,busyHere=working.has(f.id),key='figure:'+f.id;
+ const meta=f.analysis?.model?`<small class="lab-figure-meta">${esc(tr('识别：'))}${esc(f.analysis.model)}${f.analysis.notes?` · ${esc(tr('视觉模型提示：'))}${esc(f.analysis.notes)}`:''}</small>`:'';
+ const actions=`<div class="lab-figure-actions">${f.experiment_id?'':`<select data-figure-move="${esc(f.id)}" aria-label="${esc(tr('放到哪个实验…'))}">${expOptions('',{blank:'放到哪个实验…'})}</select>`}${isTable&&f.experiment_id?`<button type="button" class="lab-link" data-lab="figure-results" data-fid="${esc(f.id)}">${esc(tr('写入结果'))}</button>`:''}${isTable?`<button type="button" class="lab-link" data-lab="figure-view" data-fid="${esc(f.id)}">${esc(tr('查看原图'))}</button><button type="button" class="lab-link" data-lab="figure-kind" data-kind="image" data-fid="${esc(f.id)}">${esc(tr('改存为图片'))}</button>`:`${f.table?`<button type="button" class="lab-link" data-lab="figure-kind" data-kind="table" data-fid="${esc(f.id)}">${esc(tr('改回表格'))}</button>`:vision?`<button type="button" class="lab-link" data-lab="figure-analyze" data-fid="${esc(f.id)}" ${busyHere?'disabled':''}>${esc(tr(busyHere?'正在识别表格…':'转成表格'))}</button>`:''}`}<button type="button" class="lab-link" data-lab="figure-edit" data-fid="${esc(f.id)}">${esc(tr('编辑'))}</button><button type="button" class="lab-link danger" data-lab="figure-delete" data-fid="${esc(f.id)}">${esc(tr(armed===key?'确认删除这张图':'删除图片'))}</button></div>`;
+ return `<figure class="lab-figure ${isTable?'is-table':'is-image'}" id="lab-figure-${esc(f.id)}">${isTable?'':`<button type="button" class="lab-figure-thumb" data-lab="figure-view" data-fid="${esc(f.id)}" aria-label="${esc(tr('查看大图'))}"><img src="${esc(f.url)}" alt="${esc(f.title||tr('图片'))}" loading="lazy"></button>`}
+ <figcaption><span class="lab-figure-kind">${esc(tr(isTable?'表格':'图片'))}</span>${f.title?`<strong>${esc(f.title)}</strong>`:''}${f.caption?`<span>${esc(f.caption)}</span>`:''}</figcaption>${isTable?tableHTML(f.table):''}${meta}${actions}</figure>`}
+function figuresHTML(e){const list=e.figures||[],mode=figureModes[e.id]||'auto',up=working.has('up:'+e.id),vision=data.vision?.ready;
+ return `<section class="lab-figures ${pasteTarget===e.id?'is-target':''}" data-drop="${esc(e.id)}" tabindex="0" aria-label="${esc(tr('图表'))}"><div class="lab-figures-head"><h4>${esc(tr('图表'))}${list.length?` <small>${list.length}</small>`:''}</h4><div class="lab-figures-tools"><select data-figure-mode="${esc(e.id)}" aria-label="${esc(tr('保存方式'))}">${options(FIGURE_MODES,mode)}</select><label class="lab-upload secondary ${up?'is-busy':''}">${esc(tr(up?'正在上传并解析…':'上传图片 / PDF'))}<input type="file" accept="${FILE_TYPES.join(',')}" multiple data-figure-file="${esc(e.id)}" ${up?'disabled':''} hidden></label></div></div>
+ ${list.length?`<div class="lab-figure-grid">${list.map(f=>figureHTML(f,e)).join('')}</div>`:''}
+ <p class="lab-hint">${esc(tr('截图可以直接粘贴（⌘V）或拖进来；也可以选择图片或 PDF 文件。结果表格会转成可编辑表格，模型图、曲线图默认保存为图片，PDF 原样保存为附件。'))}${vision?'':` ${esc(tr('还没配置视觉模型：图片会直接保存，配置后可以转成表格。'))} <button type="button" class="lab-link" data-lab="vision-open">${esc(tr('去设置'))}</button>`}</p></section>`}
+function visionHTML(){const v=data.vision||{},d=visionDraft||{vision_base_url:v.base_url||'',vision_model:v.vision_model||'',vision_protocol:v.protocol||'auto',vision_api_key:''};visionDraft=d;
+ return `<details class="lab-panel lab-vision" id="lab-vision" ${visionOpen?'open':''}><summary><span>${esc(tr('图片解析模型'))}</span><small class="${v.ready?'is-ready':''}">${esc(tr(v.ready?'已配置':'未配置'))}${v.ready?' · '+esc(v.model):''}</small></summary>
+ <p class="lab-hint">${esc(tr('默认直接用“AI 设置”里的模型（deepseek-flash 可以读图）。想换成别的读图模型，例如通义千问 VL、GPT-4o、Claude、Gemini，再在这里填写。'))}</p>
+ <form id="lab-vision-form" class="lab-form"><label>${esc(tr('服务地址'))}<input name="vision_base_url" data-m="vision" value="${esc(d.vision_base_url)}" placeholder="${esc(tr('留空则使用“AI 设置”里的服务地址和 Key'))}" inputmode="url"></label>
+ <label>${esc(tr('模型名称'))}<input name="vision_model" data-m="vision" value="${esc(d.vision_model)}" placeholder="${esc(tr('例如 qwen-vl-max、gpt-4o、claude-sonnet-4-5'))}"></label>
+ <label>${esc(tr('接口协议'))}<select name="vision_protocol" data-m="vision">${options({auto:'自动',chat:'OpenAI 兼容',anthropic:'Anthropic'},d.vision_protocol)}</select></label>
+ <label>API Key<input name="vision_api_key" data-m="vision" type="password" autocomplete="off" value="${esc(d.vision_api_key)}" placeholder="${esc(v.key_configured?tr('已保存，留空表示不修改'):v.uses_main_service?tr('使用 AI 设置里的服务'):'')}"></label>
+ <div class="lab-buttons"><button type="submit" class="primary">${esc(tr('保存视觉模型'))}</button>${v.key_configured?`<button type="button" class="secondary" data-lab="vision-clear">${esc(tr('清除视觉模型 Key'))}</button>`:''}</div></form>
+ <p class="lab-hint">${esc(tr('图片和识别结果只保存在本机；解析时会把这张图片发给你配置的模型服务。'))}</p></details>`}
 function cardHTML(e){if(editing?.id===e.id)return editorHTML();
  return `<article class="lab-card status-${esc(e.status)}" id="lab-exp-${esc(e.id)}"><header class="lab-card-head"><div><h3>${esc(e.title)}</h3><div class="lab-meta"><span class="lab-status">${esc(tr(STATUS[e.status]||'进行中'))}</span>${e.agent?`<span class="lab-agent">${esc(e.agent)}</span>`:''}<span>${e.log_count} ${esc(tr('条记录'))}${e.last_day?` · ${esc(tr('最近'))} ${esc(e.last_day)}`:''}</span></div></div>
  <div class="lab-card-actions"><button type="button" class="secondary" data-lab="log-open" data-id="${esc(e.id)}">${esc(tr('记一条'))}</button><button type="button" class="secondary" data-lab="toggle" data-id="${esc(e.id)}">${esc(tr(e.status==='done'?'恢复进行中':'标记完成'))}</button><button type="button" class="secondary" data-lab="edit" data-id="${esc(e.id)}">${esc(tr('编辑'))}</button></div></header>
- ${factsHTML(e)}${variantsHTML(e)}${linksHTML(e)}${logsHTML(e)}</article>`;
+ ${factsHTML(e)}${figuresHTML(e)}${variantsHTML(e)}${linksHTML(e)}${logsHTML(e)}</article>`;
 }
 function visible(){const q=query.trim().toLowerCase();return exps().filter(e=>(filter==='all'||e.status===filter)&&(!q||[e.title,e.agent,e.directory,e.model,e.data].join(' ').toLowerCase().includes(q)))}
 function listHTML(){const list=visible(),any=exps().length;
@@ -211,9 +323,16 @@ function reportHTML(){const loose=data.logs.filter(l=>!l.experiment_id);
  <div class="lab-buttons"><button type="button" class="secondary" data-lab="report-draft" data-mode="plain" ${busy?'disabled':''}>${esc(tr('按记录生成草稿'))}</button><button type="button" class="secondary" data-lab="report-draft" data-mode="ai" ${busy?'disabled':''}>${esc(tr(busy==='report'?'正在总结…':'AI 总结今天'))}</button><button type="button" class="primary" data-lab="report-save" ${busy?'disabled':''}>${esc(tr('保存日报'))}</button></div>
  <p class="lab-hint" id="lab-report-state" role="status">${esc(reportNote||tr(reportDirty?'有未保存的修改':data.report?'已保存':'这一天还没有日报'))}</p></section>
  ${loose.length?`<section class="lab-panel"><h3>${esc(tr('未归类的记录'))} · ${loose.length}</h3><ul class="lab-logs">${loose.map(l=>logItem(l,true)).join('')}</ul></section>`:''}
- <section class="lab-panel"><h3>${esc(tr('最近几天'))}</h3>${data.days.length?`<ul class="lab-days">${data.days.map(d=>`<li><button type="button" data-lab="open-day" data-day="${esc(d.day)}" class="${d.day===day?'selected':''}"><span>${esc(d.day)}</span><small>${d.logs} ${esc(tr('条记录'))}${d.report?` · ${esc(tr('有日报'))}`:''}</small></button></li>`).join('')}</ul>`:`<p class="lab-empty-line">${esc(tr('记录会按天出现在这里。'))}</p>`}</section></aside>`;
+ <section class="lab-panel"><h3>${esc(tr('最近几天'))}</h3>${data.days.length?`<ul class="lab-days">${data.days.map(d=>`<li><button type="button" data-lab="open-day" data-day="${esc(d.day)}" class="${d.day===day?'selected':''}"><span>${esc(d.day)}</span><small>${d.logs} ${esc(tr('条记录'))}${d.report?` · ${esc(tr('有日报'))}`:''}</small></button></li>`).join('')}</ul>`:`<p class="lab-empty-line">${esc(tr('记录会按天出现在这里。'))}</p>`}</section>${(data.loose_figures||[]).length?`<section class="lab-panel lab-loose-figures"><h3>${esc(tr('未归类的图表'))} · ${data.loose_figures.length}</h3><div class="lab-figure-grid">${data.loose_figures.map(f=>figureHTML(f,null)).join('')}</div></section>`:''}${visionHTML()}</aside>`;
 }
-function bind(){root.onclick=handle;root.oninput=input;root.onchange=change;root.onsubmit=submit}
+function bind(){root.onclick=handle;root.oninput=input;root.onchange=change;root.onsubmit=submit;
+ root.ondragover=e=>{const zone=e.target.closest?.('[data-drop]');if(!zone||!e.dataTransfer?.types?.includes('Files'))return;e.preventDefault();zone.classList.add('is-dragging')};
+ root.ondragleave=e=>{const zone=e.target.closest?.('[data-drop]');if(zone&&!zone.contains(e.relatedTarget))zone.classList.remove('is-dragging')};
+ root.ondrop=e=>{const zone=e.target.closest?.('[data-drop]');if(!zone)return;e.preventDefault();zone.classList.remove('is-dragging');pasteTarget=zone.dataset.drop;uploadImages(zone.dataset.drop,[...(e.dataTransfer?.files||[])])}}
+document.addEventListener('paste',e=>{if(!active())return;const files=[...(e.clipboardData?.files||[])].filter(f=>FILE_TYPES.includes(f.type));if(!files.length)return;
+ if(e.target.closest?.('textarea,input')&&!e.target.closest('[data-drop]'))return;
+ const zone=dropTarget(document.activeElement)||pasteTarget,target=zone;
+ e.preventDefault();uploadImages(target==='__new'&&editing&&!editing.id||target==='__capture'||expById(target)?target:'__capture',files)});
 function paint(){
  if(!active())return;
  window.UII18N?.add(dictionary);document.title=tr('实验记录');
@@ -227,7 +346,7 @@ function paint(){
  bind();
 }
 
-const models={exp:()=>editing,variant:()=>variantEdit,link:()=>linkDraft,paper:()=>paperEdit};
+const models={exp:()=>editing,variant:()=>variantEdit,link:()=>linkDraft,paper:()=>paperEdit,figure:()=>figureEdit,vision:()=>visionDraft};
 function input(e){
  if(!active())return;const el=e.target;
  if(el.id==='lab-capture'){capture=el.value;return}
@@ -237,6 +356,7 @@ function input(e){
  if(el.id==='lab-target'){target=el.value;return}
  if(el.dataset.pexp&&paperEdit){(paperEdit.links[el.dataset.pexp]||={on:false,note:''}).on=el.checked;return}
  if(el.dataset.pnote&&paperEdit){const link=(paperEdit.links[el.dataset.pnote]||={on:false,note:''});link.note=el.value;if(el.value&&!link.on){link.on=true;const box=root.querySelector('[data-pexp="'+el.dataset.pnote+'"]');if(box)box.checked=true}return}
+ if(el.dataset.fcell&&figureEdit?.table){const [r,c]=el.dataset.fcell.split(',').map(Number);if(r<0)figureEdit.table.columns[c]=el.value;else figureEdit.table.rows[r][c]=el.value;return}
  const draft=el.closest('[data-draft]');
  if(draft&&drafts&&el.name){const d=drafts[Number(draft.dataset.draft)];if(d)d[el.name]=el.value;return}
  const model=models[el.dataset.m]?.();
@@ -245,6 +365,10 @@ function input(e){
 function change(e){
  if(!active())return;const el=e.target;
  if(el.id==='lab-day'){gotoDay(el.value);return}
+ if(el.dataset.figureMode){figureModes[el.dataset.figureMode]=el.value;return}
+ if(el.dataset.figureMove){if(el.value)figureCall({action:'move',id:el.dataset.figureMove,experiment_id:el.value},el.dataset.figureMove).then(v=>{if(v)flash(tr('图片已移动'))});return}
+ if(el.dataset.figureFile){const files=[...el.files];el.value='';uploadImages(el.dataset.figureFile,files);return}
+ if(el.closest('#lab-vision')&&el.tagName==='SELECT'&&visionDraft&&el.name){visionDraft[el.name]=el.value;return}
  if(el.dataset.move){post({action:'log-move',id:el.dataset.move,experiment_id:el.value});return}
  const draft=el.closest('[data-draft]');
  if(draft&&drafts&&el.name==='target'){const d=drafts[Number(draft.dataset.draft)];if(d){d.target=el.value;paint()}}
@@ -257,7 +381,8 @@ async function submit(e){
   if(await post({action:'apply',entries,batch})){drafts=null;capture='';flash(tr('已记录到各个实验'));paint()}
  }else if(id==='lab-editor'){
   const {id:experimentId,revision,...experiment}=editing;
-  if(await post({action:'save',id:experimentId,revision,experiment})){editing=null;flash(tr('实验已保存'));paint()}
+  if(await post({action:'save',id:experimentId,revision,experiment})){editing=null;flash(tr('实验已保存'));const queued=pendingFiles.map(p=>p.file),savedId=data.saved_id;clearPending();paint();
+   if(queued.length&&savedId){figureModes[savedId]=figureModes.__new||'auto';await uploadImages(savedId,queued)}}
  }else if(id==='lab-variant-form'){
   const {id:variantId,experiment_id,...variant}=variantEdit;
   if(await post({action:'variant-save',experiment_id,id:variantId,variant})){variantEdit=null;flash(tr('变体已保存'));paint()}
@@ -267,14 +392,54 @@ async function submit(e){
   const {id:paperId,revision,links,experiments,...paper}=paperEdit;
   const linked=Object.entries(links).filter(([,l])=>l.on).map(([experiment_id,l])=>({experiment_id,note:l.note}));
   if(await post({action:'paper-save',id:paperId,revision,paper,experiments:linked})){paperEdit=null;flash(tr('论文已保存'));paint()}
+ }else if(id==='lab-figure-form'){
+  const {id:figureId,revision,title,caption,kind,table}=figureEdit;
+  if(await figureCall({action:'update',id:figureId,revision,title,caption,kind,...(table?{table}:{})},figureId)){figureEdit=null;flash(tr(table?'表格已更新':'图表已更新'));paint()}
+ }else if(id==='lab-vision-form'){
+  try{busy='vision';paint();const v=await request('/api/experiments/vision',{...visionDraft,...(visionDraft.vision_api_key?{}:{vision_api_key:undefined})});data.vision=v;visionDraft=null;visionOpen=true;flash(tr('视觉模型已保存'))}catch(err){flash(err.message,true)}finally{busy='';paint()}
  }else if(id==='lab-log-form'){
   if(!logText.trim()){flash(tr('请先写下今天做了什么。'),true);paint();return}
   if(await post({action:'log',experiment_id:logFor,content:logText,batch:uid()})){logFor=null;logText='';flash(tr('已记录'));paint()}
  }
 }
+async function figureCall(body,key){working.add(key);paint();try{const v=await request('/api/experiments/figure',{day,...body});accept(v);return v}catch(e){flash(e.message,true);return null}finally{working.delete(key);paint()}}
+function readImage(file){return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result).split(',')[1]||'');reader.onerror=()=>reject(Error(tr('读取图片失败，请重新选择')));reader.readAsDataURL(file)})}
+async function uploadImages(zone,files){
+ if(zone==='__new'){
+  for(const file of files){
+   if(!FILE_TYPES.includes(file?.type)){flash(tr('只支持图片（PNG、JPEG、GIF、WebP）和 PDF'),true);continue}
+   if(file.type==='application/pdf'?file.size>MAX_PDF:file.size>MAX_IMAGE){flash(tr(file.type==='application/pdf'?'PDF 超过 15 MB，请压缩或只保留需要的页面后再上传':'图片超过 10 MB，请压缩或截取需要的部分后再上传'),true);continue}
+   pendingFiles.push({file,preview:file.type.startsWith('image/')&&globalThis.URL?.createObjectURL?URL.createObjectURL(file):''});flash(tr('已加入，保存实验后上传'))
+  }
+  paint();return
+ }
+ const experimentId=zone==='__capture'?target:zone;
+ const images=files.filter(f=>f&&FILE_TYPES.includes(f.type));
+ if(!images.length){flash(tr('只支持图片（PNG、JPEG、GIF、WebP）和 PDF'),true);paint();return}
+ for(const file of images){
+  const pdf=file.type==='application/pdf';
+  if(pdf&&file.size>MAX_PDF){flash(tr('PDF 超过 15 MB，请压缩或只保留需要的页面后再上传'),true);continue}
+  if(!pdf&&file.size>MAX_IMAGE){flash(tr('图片超过 10 MB，请压缩或截取需要的部分后再上传'),true);continue}
+  let encoded;try{encoded=await readImage(file)}catch(e){flash(e.message,true);continue}
+  const v=await figureCall({action:'upload',experiment_id:experimentId,mode:figureModes[zone]||'auto',filename:file.name||'',data:encoded},'up:'+zone);
+  if(v){const r=v.figure_result||{};flash(r.notice||tr(r.kind==='table'?'已识别为表格':r.kind==='file'?'已保存 PDF 附件':'已保存为图片'),!!r.notice&&r.kind!=='table'&&/没有完成/.test(r.notice))}
+ }
+ paint();
+}
+function figureById(fid){for(const e of exps())for(const f of e.figures||[])if(f.id===fid)return {f,e};const f=(data?.loose_figures||[]).find(x=>x.id===fid);return f?{f,e:null}:{}}
+function viewImage(f){
+ document.querySelector('.lab-lightbox')?.remove();
+ const box=document.createElement('div');box.className='lab-lightbox';box.setAttribute('role','dialog');box.setAttribute('aria-modal','true');
+ box.innerHTML=`<button type="button" class="lab-lightbox-close" aria-label="${esc(tr('关闭'))}">×</button><figure><img src="${esc(f.url)}" alt="${esc(f.title||tr('图片'))}">${f.title||f.caption?`<figcaption>${f.title?`<strong>${esc(f.title)}</strong>`:''}${f.caption?` ${esc(f.caption)}`:''}</figcaption>`:''}</figure>`;
+ const close=()=>{document.removeEventListener('keydown',onKey);box.remove()};const onKey=ev=>{if(ev.key==='Escape')close()};
+ box.addEventListener('click',ev=>{if(ev.target===box||ev.target.closest('.lab-lightbox-close'))close()});document.addEventListener('keydown',onKey);document.body.append(box);
+}
+function dropTarget(el){return el?.closest?.('[data-drop]')?.dataset.drop||''}
 function reveal(selector){requestAnimationFrame(()=>root.querySelector(selector)?.scrollIntoView({behavior:'smooth',block:'start'}))}
 async function handle(e){
- if(!active())return;const b=e.target.closest('[data-lab]');if(!b)return;
+ if(!active())return;const zone=dropTarget(e.target);if(zone&&zone!==pasteTarget){pasteTarget=zone;root.querySelectorAll('.lab-figures').forEach(s=>s.classList.toggle('is-target',s.dataset.drop===zone))}
+ const summary=e.target.closest('summary');if(summary&&summary.parentElement?.id==='lab-vision'){visionOpen=!summary.parentElement.open;return}
+ const b=e.target.closest('[data-lab]');if(!b)return;
  const action=b.dataset.lab,id=b.dataset.id,experiment=expById(id);
  if(busy&&!['tab','filter','paper-filter'].includes(action))return;
  switch(action){
@@ -299,7 +464,8 @@ async function handle(e){
   case 'draft-cancel':drafts=null;paint();break;
   case 'new':tab='experiments';editing={title:'',status:'active',agent:'',directory:'',data:'',model:'',results:'',conclusion:'',paths:'',notes:''};paint();reveal('#lab-editor');break;
   case 'edit':if(experiment){editing={...experiment};paint()}break;
-  case 'edit-cancel':editing=null;paint();break;
+  case 'edit-cancel':editing=null;clearPending();paint();break;
+  case 'pending-remove':{const [p]=pendingFiles.splice(Number(b.dataset.index),1);if(p?.preview)globalThis.URL?.revokeObjectURL?.(p.preview);paint();break}
   case 'delete':if(experiment&&arm('exp:'+id)&&await post({action:'delete',id,revision:experiment.revision})){editing=null;flash(tr('实验已删除，记录保留在“未归类”'));paint()}break;
   case 'toggle':if(experiment)await post({action:'toggle-done',id,revision:experiment.revision});break;
   case 'log-open':logFor=id;logText='';paint();root.querySelector('#lab-quicklog')?.focus();break;
@@ -325,6 +491,18 @@ async function handle(e){
    try{const v=await request('/api/experiments/report',{day,mode});reportText=reportText.trim()?reportText.replace(/\s+$/,'')+'\n\n'+v.content:v.content;reportDirty=true;stash();reportNote=tr(mode==='ai'?'AI 草稿已填入，确认后点“保存日报”。':'草稿已填入，确认后点“保存日报”。')}
    catch(err){reportNote=err.message}finally{busy='';paint()}
    break}
+  case 'figure-view':{const {f}=figureById(b.dataset.fid);if(f)viewImage(f);break}
+  case 'figure-edit':{const {f}=figureById(b.dataset.fid);if(f){figureEdit={id:f.id,revision:f.revision,title:f.title,caption:f.caption,kind:f.kind,table:f.kind==='table'&&f.table?JSON.parse(JSON.stringify(f.table)):null};paint()}break}
+  case 'figure-cancel':figureEdit=null;paint();break;
+  case 'figure-row-add':if(figureEdit?.table){figureEdit.table.rows.push(figureEdit.table.columns.map(()=>''));paint()}break;
+  case 'figure-col-add':if(figureEdit?.table){figureEdit.table.columns.push('');figureEdit.table.rows.forEach(r=>r.push(''));paint()}break;
+  case 'figure-row-del':if(figureEdit?.table&&figureEdit.table.rows.length>1){figureEdit.table.rows.splice(Number(b.dataset.row),1);paint()}break;
+  case 'figure-delete':{const fid=b.dataset.fid;if(arm('figure:'+fid)&&await figureCall({action:'delete',id:fid},fid)){if(figureEdit?.id===fid)figureEdit=null;flash(tr('图片已删除'))}break}
+  case 'figure-analyze':{const fid=b.dataset.fid;const v=await figureCall({action:'analyze',id:fid},fid);if(v){const r=v.figure_result||{};flash(r.notice||tr(r.kind==='table'?'已识别为表格':'已保存为图片'))}break}
+  case 'figure-kind':{const {f}=figureById(b.dataset.fid);if(f&&await figureCall({action:'update',id:f.id,revision:f.revision,kind:b.dataset.kind},f.id))flash(tr('图表已更新'));break}
+  case 'figure-results':{const fid=b.dataset.fid;if(await figureCall({action:'to-results',id:fid},fid))flash(tr('表格已写入结果'));break}
+  case 'vision-open':visionOpen=true;paint();reveal('#lab-vision');break;
+  case 'vision-clear':try{busy='vision';paint();data.vision=await request('/api/experiments/vision',{clear_vision_api_key:true});visionDraft=null;flash(tr('视觉模型 Key 已清除'))}catch(err){flash(err.message,true)}finally{busy='';paint()}break;
   case 'report-save':
    if(await post({action:'report',content:reportText,revision:reportRevision})){reportDirty=false;stash();reportNote=tr('日报已保存')}else reportNote=notice;
    paint();break;

@@ -75,6 +75,8 @@ def init(desk):
         c.execute('''CREATE TABLE IF NOT EXISTS lab_paper_experiments(
           paper_id TEXT NOT NULL, experiment_id TEXT NOT NULL, note TEXT NOT NULL DEFAULT '',
           PRIMARY KEY(paper_id,experiment_id))''')
+    from . import figures
+    figures.init(desk)
 
 
 def text_value(value, limit, label):
@@ -139,7 +141,10 @@ def read(desk, day=None):
         for r in c.execute("SELECT day FROM lab_reports WHERE content<>'' ORDER BY day DESC LIMIT 60"):
             days.setdefault(r['day'], {'day': r['day'], 'logs': 0, 'report': False})['report'] = True
     known = {e['id'] for e in experiments}
+    from . import figures as FIGURES
+    figure_map = FIGURES.for_read(desk)
     for item in experiments:
+        item['figures'] = figure_map.get(item['id'], [])
         item['log_count'], item['last_day'] = counts.get(item['id'], (0, ''))
         item['variants'] = [v for v in variants if v['experiment_id'] == item['id']]
         item['links'] = ([{'id': l['id'], 'other': l['dst'], 'kind': l['kind'], 'direction': 'out', 'note': l['note']}
@@ -157,7 +162,8 @@ def read(desk, day=None):
     papers.sort(key=lambda p: p['done'])
     return {'experiments': experiments, 'papers': papers, 'logs': logs, 'report': dict(row) if row else None,
             'days': sorted(days.values(), key=lambda d: d['day'], reverse=True)[:30],
-            'day': day, 'today': today(), 'ai_available': ai_available(desk)}
+            'day': day, 'today': today(), 'ai_available': ai_available(desk), 'vision': FIGURES.vision_status(desk),
+            'loose_figures': figure_map.get('', [])}
 
 
 def merged(old, new, day, dated):
@@ -258,6 +264,8 @@ def save(desk, data):
     day = day_value(data.get('day'))
     gone, stale = '实验不存在，可能已被删除', '这个实验刚被更新过，请刷新后再操作'
     paper_gone, paper_stale = '论文不存在，可能已被删除', '这篇论文刚被更新过，请刷新后再操作'
+    removed_files = []
+    saved_id = ''
     with desk.conn() as c:
         c.execute('BEGIN IMMEDIATE')
         if action == 'save':
@@ -269,7 +277,7 @@ def save(desk, data):
             else:
                 c.execute('INSERT INTO lab_experiments(id,' + ','.join(values) + ',created,updated) VALUES('
                           + ','.join('?' for _ in range(len(values) + 3)) + ')',
-                          (uuid.uuid4().hex, *values.values(), stamp(), stamp()))
+                          (saved_id := uuid.uuid4().hex, *values.values(), stamp(), stamp()))
         elif action == 'toggle-done':
             row = checked_row(c, 'lab_experiments', data.get('id'), data.get('revision'), gone, stale)
             c.execute('UPDATE lab_experiments SET status=?,updated=?,revision=revision+1 WHERE id=?',
@@ -280,6 +288,8 @@ def save(desk, data):
             c.execute("UPDATE lab_logs SET experiment_id='',content=? || content WHERE experiment_id=?",
                       ('【' + row['title'] + '】', row['id']))
             c.execute('DELETE FROM lab_variants WHERE experiment_id=?', (row['id'],))
+            removed_files = [r['file'] for r in c.execute('SELECT file FROM lab_figures WHERE experiment_id=?', (row['id'],))]
+            c.execute('DELETE FROM lab_figures WHERE experiment_id=?', (row['id'],))
             c.execute('DELETE FROM lab_links WHERE src=? OR dst=?', (row['id'], row['id']))
             c.execute('DELETE FROM lab_paper_experiments WHERE experiment_id=?', (row['id'],))
             c.execute('DELETE FROM lab_experiments WHERE id=?', (row['id'],))
@@ -370,7 +380,14 @@ def save(desk, data):
             c.execute('DELETE FROM lab_papers WHERE id=?', (row['id'],))
         else:
             raise ValueError('操作无效')
-    return read(desk, day)
+    if removed_files:
+        from . import figures as FIGURES
+        for name in removed_files:
+            (FIGURES.folder(desk) / name).unlink(missing_ok=True)
+    out = read(desk, day)
+    if action == 'save':
+        out['saved_id'] = saved_id or data.get('id', '')
+    return out
 
 
 def ask(desk, system, user, schema, stage, max_tokens):

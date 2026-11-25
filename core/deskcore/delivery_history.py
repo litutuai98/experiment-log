@@ -44,12 +44,25 @@ def collect(desk,fn,workspace):
     finally:
         with desk.conn() as c:c.execute('UPDATE delivery_runs SET finished=?,state=?,details=? WHERE id=?',(desk.now(),state,json.dumps(details,ensure_ascii=False),run))
 
+def all_sources_failed(run):
+    # Every configured source errored: the day has nothing yet, so retry longer.
+    try:sources=json.loads(run.get('details') or '{}').get('sources') or []
+    except (TypeError,ValueError):return False
+    return bool(sources) and all(s.get('error') for s in sources)
+
+
 def should_run(desk,cfg):
     stamp=desk.now()
     if not cfg.get('auto_refresh') or stamp[11:16]<cfg['daily_time']:return False
     with desk.conn() as c:runs=[dict(r) for r in c.execute('SELECT * FROM delivery_runs WHERE day=? ORDER BY started',(stamp[:10],))]
     if not runs:return True
     if any(r['state'] in ('running','delivered','empty') for r in runs):return False
+    # A day where every source failed gets up to five attempts half an hour apart;
+    # ordinary partial runs keep the three-attempt, fifteen-minute policy.
+    if all_sources_failed(runs[-1]):
+        if len(runs)>=5:return False
+        last=dt.datetime.fromisoformat(runs[-1]['finished'] or runs[-1]['started'])
+        return (dt.datetime.fromisoformat(stamp)-last).total_seconds()>=1800
     if len(runs)>=3:return False
     last=dt.datetime.fromisoformat(runs[-1]['finished'] or runs[-1]['started'])
     return (dt.datetime.fromisoformat(stamp)-last).total_seconds()>=900

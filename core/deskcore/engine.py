@@ -38,7 +38,7 @@ JOBS = {}
 CANCELLED = set()   # job ids the user asked to stop; workers check before and during long loops
 LOCK = threading.RLock()
 CODEX_LOCK = threading.Lock()
-DEFAULT = {'api_model_overrides':{},'api_protocol':'auto','ai_engine':'api', 'api_effort':'default', 'api_reasoning_mode':'auto', 'api_effort_mapping':'', 'codex_model':'gpt-6.1-sol', 'codex_effort':'high', 'base_url':'https://api.deepseek.com', 'model':'deepseek-flash', 'api_key':'', 'scholar_key':'', 'search_provider':'academic', 'search_api_key':'', 'auto_refresh':False, 'daily_time':'08:30', 'max_items':50, 'auto_review':True, 'daily_limit':50, 'hot_limit':10, 'interest_topics':'声学, 语音, 音频, 音乐', 'auto_screen':True}
+DEFAULT = {'api_model_overrides':{},'api_protocol':'auto','ai_engine':'api', 'api_effort':'default', 'api_reasoning_mode':'auto', 'api_effort_mapping':'', 'codex_model':'gpt-6.1-sol', 'codex_effort':'high', 'base_url':'https://api.deepseek.com', 'model':'deepseek-flash', 'api_key':'', 'scholar_key':'', 'search_provider':'academic', 'search_api_key':'', 'auto_refresh':False, 'daily_time':'08:30', 'max_items':50, 'auto_review':True, 'daily_limit':50, 'hot_limit':10, 'interest_topics':'声学, 语音, 音频, 音乐', 'auto_screen':True, 'vision_base_url':'', 'vision_model':'', 'vision_protocol':'auto', 'vision_api_key':''}
 API_PROVIDERS = [
     {'id':'deepseek','name':'DeepSeek','base_url':'https://api.deepseek.com','models':['deepseek-flash','deepseek-pro']},
     {'id':'openai','name':'OpenAI 官方','base_url':'https://api.openai.com/v1','models':['gpt-6.1-sol','gpt-6-astra','gpt-5.3-codex']},
@@ -459,6 +459,7 @@ def save_settings(v):
     for k in DEFAULT:
         if k!='api_model_overrides' and k in v and not (k.endswith('key') and v[k]==''): cur[k]=v[k]
     if v.get('clear_api_key'): cur['api_key']=''
+    if v.get('clear_vision_api_key'): cur['vision_api_key']=''
     if cur['search_provider'] not in ['academic','deepseek','brave','tavily']: raise ValueError('请选择有效的搜索服务')
     if cur['search_provider'] not in ['academic','deepseek'] and v.get('search_provider') and cur['search_provider']!=settings().get('search_provider') and not v.get('search_api_key'): cur['search_api_key']=''
     if cur['ai_engine'] not in ['api','codex']:raise ValueError('请选择 API 或本地 Codex。')
@@ -1509,7 +1510,7 @@ def _ingest_source(s,run,started):
     else: raise ValueError('暂不支持该来源')
     for v in batch: v.update(_collection_run=run,workspace=s.get('workspace','research'),source_id=s['id'],source=s['name'],source_group=s.get('source_group','manual'))
     if s.get('workspace','research')=='research' and s.get('kind')=='paper':
-        import direction_trends
+        from deskcore import direction_trends
         direction_trends.remember_source(enrichment_desk(),batch,s)
     collected=[add_item(v) for v in batch]
     count=sum(new for iid,new in collected)

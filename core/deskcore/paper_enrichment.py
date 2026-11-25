@@ -101,6 +101,28 @@ def material_context(desk, iid):
 def norm(s): return re.sub(r'\W+', '', s.casefold())
 
 
+def collective_signature(first_page, pages, authors):
+    """团队署名：首页只写团队名，个人名单在后面的 Contributors 页且没有逐人单位。
+
+    返回 {'team','page','quote','names'}；不满足条件返回 None。不替作者推断单位。
+    """
+    header = norm(re.split(r'\bAbstract', first_page, maxsplit=1, flags=re.I)[0])
+    missing = [a for a in authors if not a.get('affiliation') and norm(a.get('name', ''))]
+    if len(missing) < 2 or any(norm(a['name']) in header for a in missing):
+        return None
+    signed = [a for a in authors if a.get('affiliation') and norm(a.get('name', '')) in header]
+    for number, body in enumerate(pages[1:80], 2):
+        section = re.search(r'(?:^|\n)\s*(?:\d+[. ]+)?(?:Authors|Contributors|Author contributions|Core Contributors)\s*\n', body, re.I)
+        if not section:
+            continue
+        excerpt = re.split(r'(?:^|\n)\s*(?:\d+[. ]+)?References\s*\n', body[section.start():], maxsplit=1, flags=re.I)[0][:7000]
+        found = [a for a in missing if norm(a['name']) in norm(excerpt)]
+        if len(found) * 5 >= len(missing) * 4:
+            team = '；'.join(dict.fromkeys('%s（%s）' % (a['name'], a['affiliation']) for a in signed))
+            return {'team': team, 'page': number, 'quote': excerpt.strip(), 'names': {norm(a['name']) for a in found}}
+    return None
+
+
 def accept_affiliation_entries(text, header, authors, entries, shared=None):
     """AI 判定每位作者的单位；本地只挡幻觉（单位必须出现在原文里）。
 
@@ -733,10 +755,25 @@ def extract_signature(desk,iid,force=False):
         result={'version':PDF_SIGNATURE_VERSION,'fingerprint':source['fingerprint'],'complete':complete,'page':1,'authors':authors,'usage':usage,'updated':desk.now()}
         record_file.write_text(json.dumps(result,ensure_ascii=False,indent=2))
         if not complete:
+            authors=[a for a in authors if norm(a.get('name',''))]  # 丢弃提取残留的空名字（如 " :"）
+            all_pages=[text]
+            try:
+                cached=folder/'pages.json'
+                if cached.exists():all_pages=json.loads(cached.read_text())['pages']
+                else:
+                    from pypdf import PdfReader
+                    all_pages=[desk.safe_pdf_text(pg.extract_text() or '') for pg in PdfReader(io.BytesIO(raw)).pages[:80]]
+            except Exception:pass
+            collective=collective_signature(text,all_pages,authors)
             for a in authors:
-                if not a.get('affiliation'):a['affiliation_note']='署名证据尚有歧义，待补充材料核实'
+                if a.get('affiliation'):continue
+                if collective and norm(a['name']) in collective['names']:
+                    a['affiliation_status']='not_explicit'
+                    a['affiliation_note']='原文为团队署名'+('：'+collective['team'] if collective['team'] else '')+'；个人名单在第 %d 页，未逐人列出单位'%collective['page']
+                    a['affiliation_evidence']={'page':collective['page'],'quote':collective['quote'][:1800],'method':'contributors-section'}
+                else:a['affiliation_note']='署名证据尚有歧义，待补充材料核实'
             with desk.conn() as c:c.execute('UPDATE items SET authors=? WHERE id=?',(json.dumps(authors,ensure_ascii=False),iid))
-            result.update(terminal=True,status='insufficient',message='署名材料仍有歧义，已保留可核实部分；需补充证据或手动重试',checks={k:v for k,v in checks.items() if k not in ['text','layout']})
+            result.update(authors=authors,terminal=True,status='not_explicit' if collective else 'insufficient',message='原文是团队署名，贡献者名单未逐人列出单位；这不是提取失败' if collective else '署名材料仍有歧义，已保留可核实部分；需补充证据或手动重试',checks={k:v for k,v in checks.items() if k not in ['text','layout']})
             record_file.write_text(json.dumps(result,ensure_ascii=False,indent=2))
         else:
             changed=False
